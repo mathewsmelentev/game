@@ -1,5 +1,5 @@
-Перейдите в нужную директорию в консоли
-Введите в консоль
-python -m venv venv
-source venv/Scripts/activate
+Перейдите в нужную директорию в консоли.<br />
+Введите в консоль<br />
+python -m venv venv<br />
+source venv/Scripts/activate<br />
 python main.py
