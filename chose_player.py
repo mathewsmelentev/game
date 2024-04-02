@@ -1,7 +1,9 @@
 import random
 import time
+import os
 
-from db_work import 
+from summoner import summon
+
 
 def player_message(datas):
     message = ' Выберите свой класс\n'
@@ -13,13 +15,25 @@ def player_message(datas):
     return message
 
 
-def choice_1(choice, enemy_hp, hp, defence, mana, stack, player, crips, value=False,):
+def choice_1(choice,
+             enemy_hp,
+             hp,
+             defence,
+             mana,
+             stack,
+             player,
+             crips,
+             max_crips,
+             value=False,):
+    check = False
+    mana_use = False
     if choice == 1:
         damag = enemy_hp
         if player[0] == 'Маг':
             if mana >= 4:
                 enemy_hp -= player[2]
                 mana -= 4
+                mana_use = True
             else:
                 enemy_hp -= round(player[2]/2)
         elif player[0] == 'Стрелок':
@@ -31,17 +45,22 @@ def choice_1(choice, enemy_hp, hp, defence, mana, stack, player, crips, value=Fa
         elif player[0] == 'Рога':
             enemy_hp -= (player[2] + 4*stack)
         elif player[0] == 'Призыватель':
-
+            crip, mana = summon(len(crips), max_crips, mana)
+            if crip == 5:
+                pass
+            else:
+                crips.append(crip)
+                print(f' Вы призвали крипа. Его зовут: {crip[0]}')
+                mana_use = True
+            value = True
         else:
             enemy_hp -= player[2]
         if value is False:
             print(f' Вы совершили атаку на {damag - enemy_hp} единиц')
-            time.sleep(2)
     elif choice == 2:
         defence = random.randint(3, 10)
         if value is False:
             print(f' Вы защитились на {defence} единиц')
-            time.sleep(2)
     elif choice == 5:
         if player[0] == 'Рога':
             print(' Вы встаёте в стойку')
@@ -61,6 +80,23 @@ def choice_1(choice, enemy_hp, hp, defence, mana, stack, player, crips, value=Fa
             else:
                 print(' Попытка встать в стойку провалилась(')
         elif player[0] == 'Призыватель':
-
-        time.sleep(1)
-    return (choice, enemy_hp, hp, defence, mana, stack)
+            os.system('clear')
+            for crip in crips:
+                if crips:
+                    print(f' Имя крипа: {crip[0]}\n',
+                          f'Здоровье крипа: {crip[1]}\n')
+            print(' Выберите, что будут делать крипы\n',
+                  '1 - атаковать\n',
+                  '0 - выйти')
+            crip_choice = int(input(' '))
+            if crip_choice == 1:
+                for crip in crips:
+                    enemy_hp -= crip[2]
+            else:
+                check = True
+        elif choice == 3:
+            print('Это инвентарь, пока не работает')
+            check = True
+    time.sleep(2)
+    os.system('clear')
+    return (choice, enemy_hp, hp, defence, mana, stack, crips, check, mana_use)

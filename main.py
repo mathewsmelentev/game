@@ -34,10 +34,13 @@ def random_choice(choice):
 
 
 while game != 0:
+    mana_plus = 0
     crips = []
     stack = 0
     turn = 0
+    max_crips = 2
     multiplayer = 0
+    mana_use = False
     while multiplayer not in [1, 2, 3, 4]:
         print(' Выберите колличество игроков(максимум 4)')
         multiplayer = int(input(' '))
@@ -54,11 +57,12 @@ while game != 0:
         enemy_dmg = round(enemy[1] * 1.5 ** float(len(players) - 1), 0)
         enemy_hp = round(enemy[2] * 1.5 ** float(len(players) - 1), 0)
         event = random.randint(1, 1000)
+        playerses = players.copy()
+        players = [list(player) for player in playerses]
+        turn += 1 / len(players)
         for player in players:
             if live_fade is True:
                 player[1] -= 2
-        playerses = players.copy()
-        players = [list(player) for player in playerses]
         if event <= 200:
             for player in players:
                 if player[1] > 0:
@@ -85,116 +89,140 @@ while game != 0:
                     if hp_pl <= 0:
                         break
                     os.system('clear')
-                    turn += 1 / len(players)
-                    player[3] += 1
+                    if mana_use:
+                        pass
+                    else:
+                        if player[0] == 'Призыватель':
+                            mana_plus = 5
+                        if player[0] == 'Маг':
+                            mana_plus = 1
+                        player[3] += mana_plus
                     if player[1] > 0:
-                        if nahl is True or unknown_yourself is True:
-                            message = (f' Ваше имя: {names[name-1]}\n'
-                                       ' Твой класс:?\n'
-                                       ' Здоровье:?\n'
-                                       ' Мана:?\n'
-                                       ' Стак:?\n')
-                            message_1 = (' Выберите действие\n'
-                                         ' 1 - удар?\n'
-                                         ' 2 - защищаться?\n'
-                                         ' 3 - посмотреть инвентарь?\n'
-                                         ' 4 - рандом?\n'
-                                         ' 5 - ?')
-                        elif player[0] == 'Маг':
-                            message = (f' Ваше имя: {names[name-1]}\n'
-                                       f' Твой класс:{player[0]}\n'
-                                       f' Здоровье:{player[1]}\n'
-                                       f' Мана:{player[3]}\n')
-                            message_1 = (' Выберите действие\n'
-                                         ' 1 - удар(если нет маны,'
-                                         ' делится на 2)\n'
-                                         ' 2 - защищаться\n'
-                                         ' 3 - посмотреть инвентарь\n'
-                                         ' 4 - рандом')
-                        elif player[0] == 'Рога':
-                            message = (f' Ваше имя: {names[name-1]}\n'
-                                       f' Твой класс:{player[0]}\n'
-                                       f' Здоровье:{player[1]}\n'
-                                       f' Стак:?\n')
-                            message_1 = (' Выберите действие\n'
-                                         ' 1 - удар\n'
-                                         ' 2 - защищаться\n'
-                                         ' 3 - посмотреть инвентарь\n'
-                                         ' 4 - рандом\n'
-                                         ' 5 - возможность встать в стойку')
-                        elif player[0] == 'Призыватель':
-                            message = (f' Ваше имя: {names[name-1]}\n'
-                                       f' Твой класс:{player[0]}\n'
-                                       f' Здоровье:{player[1]}\n')
-                            message_1 = (' Выберите действие\n'
-                                         ' 1 - призвать крипа\n'
-                                         ' 2 - защищаться\n'
-                                         ' 3 - посмотреть инвентарь\n'
-                                         ' 4 - рандом\n'
-                                         ' 5 - посмотреть крипов')
-                        else:
-                            message = (f' Ваше имя: {names[name-1]}\n'
-                                       f' Твой класс:{player[0]}\n'
-                                       f' Здоровье:{player[1]}\n')
-                            message_1 = (' Выберите действие\n'
-                                         ' 1 - удар\n'
-                                         ' 2 - защищаться\n'
-                                         ' 3 - посмотреть инвентарь\n'
-                                         ' 4 - рандом')
+                        check = True
+                        while check:
+                            check = False
+                            if nahl is True or unknown_yourself is True:
+                                message = (f' Ваше имя: {names[name-1]}\n'
+                                           ' Твой класс:?\n'
+                                           ' Здоровье:?\n'
+                                           ' Мана:?\n'
+                                           ' Стак:?\n')
+                                message_1 = (' Выберите действие\n'
+                                             ' 1 - удар?\n'
+                                             ' 2 - защищаться?\n'
+                                             ' 3 - посмотреть инвентарь?\n'
+                                             ' 4 - рандом?\n'
+                                             ' 5 - ?')
+                            elif player[0] == 'Маг':
+                                message = (f' Ваше имя: {names[name-1]}\n'
+                                           f' Твой класс:{player[0]}\n'
+                                           f' Здоровье:{player[1]}\n'
+                                           f' Мана:{player[3]}\n')
+                                message_1 = (' Выберите действие\n'
+                                             ' 1 - удар(если нет маны,'
+                                             ' делится на 2)\n'
+                                             ' 2 - защищаться\n'
+                                             ' 3 - посмотреть инвентарь\n'
+                                             ' 4 - рандом')
+                            elif player[0] == 'Рога':
+                                message = (f' Ваше имя: {names[name-1]}\n'
+                                           f' Твой класс:{player[0]}\n'
+                                           f' Здоровье:{player[1]}\n'
+                                           f' Стак:?\n')
+                                message_1 = (' Выберите действие\n'
+                                             ' 1 - удар\n'
+                                             ' 2 - защищаться\n'
+                                             ' 3 - посмотреть инвентарь\n'
+                                             ' 4 - рандом\n'
+                                             ' 5 - возможность встать в стойку')
+                            elif player[0] == 'Призыватель':
+                                message = (f' Ваше имя: {names[name-1]}\n'
+                                           f' Твой класс:{player[0]}\n'
+                                           f' Здоровье:{player[1]}\n'
+                                           f' Мана:{player[3]}\n')
+                                message_1 = (' Выберите действие\n'
+                                             ' 1 - призвать крипа\n'
+                                             ' 2 - защищаться\n'
+                                             ' 3 - посмотреть инвентарь\n'
+                                             ' 4 - рандом\n'
+                                             ' 5 - посмотреть крипов')
+                            else:
+                                message = (f' Ваше имя: {names[name-1]}\n'
+                                           f' Твой класс:{player[0]}\n'
+                                           f' Здоровье:{player[1]}\n')
+                                message_1 = (' Выберите действие\n'
+                                             ' 1 - удар\n'
+                                             ' 2 - защищаться\n'
+                                             ' 3 - посмотреть инвентарь\n'
+                                             ' 4 - рандом')
 
-                        print(message)
-                        if unknown_enemies is True:
-                            print(' Вы встретили: ?\n',
-                                  'Здоровья у противника: ?\n')
-                        else:
-                            print(f' Вы встретили: {enemy_name}\n',
-                                  f'Здоровья у противника: {enemy_hp}\n')
-                        print(message_1)
-                        choice = int(input(' '))
-                        help_choice = False
-                        defence = 0
-                        if choice == 4:
-                            choice = random_choice(choice)
-                            (choice,
-                             enemy_hp,
-                             player[1],
-                             defence,
-                             player[3],
-                             stack,
-                             crips) = choice_1(choice,
-                                               enemy_hp,
-                                               player[1],
-                                               defence,
-                                               player[3],
-                                               stack,
-                                               player,
-                                               crips,
-                                               True)
-                        else:
-                            (choice,
-                             enemy_hp,
-                             player[1],
-                             defence,
-                             player[3],
-                             stack,
-                             crips) = choice_1(choice,
-                                               enemy_hp,
-                                               player[1],
-                                               defence,
-                                               player[3],
-                                               stack,
-                                               player,
-                                               crips)
+                            print(message)
+                            if unknown_enemies is True:
+                                print(' Вы встретили: ?\n',
+                                      'Здоровья у противника: ?\n')
+                            else:
+                                print(f' Вы встретили: {enemy_name}\n',
+                                      f'Здоровья у противника: {enemy_hp}\n')
+                            print(message_1)
+                            choice = int(input(' '))
+                            help_choice = False
+                            defence = 0
+                            if choice == 4:
+                                choice = random_choice(choice)
+                                (choice,
+                                 enemy_hp,
+                                 player[1],
+                                 defence,
+                                 player[3],
+                                 stack,
+                                 crips,
+                                 check,
+                                 mana_use) = choice_1(choice,
+                                                      enemy_hp,
+                                                      player[1],
+                                                      defence,
+                                                      player[3],
+                                                      stack,
+                                                      player,
+                                                      crips,
+                                                      max_crips,
+                                                      True)
+                            else:
+                                (choice,
+                                 enemy_hp,
+                                 player[1],
+                                 defence,
+                                 player[3],
+                                 stack,
+                                 crips,
+                                 check,
+                                 mana_use) = choice_1(choice,
+                                                      enemy_hp,
+                                                      player[1],
+                                                      defence,
+                                                      player[3],
+                                                      stack,
+                                                      player,
+                                                      crips,
+                                                      max_crips)
                         action_enemy = random.randint(1, 100)
+                        cripses = crips.copy()
+                        crips = [list(crip) for crip in cripses]
                         if action_enemy >= 30:
                             if enemy_hp > 0:
                                 defence -= enemy_dmg
-                                if defence >= 0:
-                                    player[1] = player[1]
+                                if player[0] == 'Призыватель' and crips:
+                                    crips[0][2] -= enemy_dmg
                                 else:
-                                    player[1] += defence
-                        else:
-                            pass
+                                    if defence >= 0:
+                                        player[1] = player[1]
+                                    else:
+                                        player[1] += defence
+                        n = 0
+                        for crip in crips:
+                            if crip[2] <= 0:
+                                crips.pop(n)
+                            n += 1
     else:
         print(f' Вы проиграли. Тебя убили на {int(turn)} ходу')
         time.sleep(2)
@@ -211,14 +239,12 @@ while game != 0:
     for i in range(0, 5):
         print(f' {records[i][0]} - {records[i][1]}')
 
-    time.sleep(1)
+    time.sleep(2)
 
     os.system('clear')
 
-    print(' Вы хотите сыграть ещё раз?(Да, Нет)')
-    game = input(' ')
-    if game == 'Да':
-        game = 1
-    else:
+    print(' Вы хотите сыграть ещё раз?(Да - 1, Нет - 2)')
+    game = int(input(' '))
+    if game == 2:
         game = 0
     os.system('clear')
