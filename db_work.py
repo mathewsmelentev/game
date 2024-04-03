@@ -21,7 +21,7 @@ def enemy_func():
 def class_func(choice):
     connection = sqlite3.connect('mygame.sqlite3')
     cursor = connection.cursor()
-    cursor.execute('SELECT name, hp, dmg, mana, max_hp FROM Classes'
+    cursor.execute('SELECT name, hp, dmg, mana, max_hp, max_mana FROM Classes'
                    f' WHERE id = {choice}')
     pl_class = cursor.fetchall()
     return pl_class[0]
@@ -38,7 +38,8 @@ def record_update(turn, pl_class):
 def records_get():
     connection = sqlite3.connect('mygame.sqlite3')
     cursor = connection.cursor()
-    cursor.execute('SELECT record, class FROM Records ORDER BY record DESC')
+    cursor.execute('SELECT record, class FROM Records'
+                   ' ORDER BY record DESC')
     records = cursor.fetchall()
     return records
 
@@ -58,9 +59,10 @@ def player_func(multiplayer):
     for n in range(multiplayer):
         print(' Введите имя игрока:')
         names.append(input(' '))
-        print(player_message(get_data()))
+        message, data = player_message(get_data())
+        print(message)
         class_player = int(input(' '))
-        if class_player == 6:
+        if class_player == data:
             class_player = random.randint(1, 5)
             # отвечает за скрытие ника и класса
             nahl = True

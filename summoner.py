@@ -8,7 +8,8 @@ def summon(count_summons, max_count_summons, mana):
     else:
         connection = sqlite3.connect('mygame.sqlite3')
         cursor = connection.cursor()
-        cursor.execute(f'SELECT name, hp, dmg, mana_cost FROM Crips WHERE mana_cost < {mana}')
+        cursor.execute('SELECT name, hp, dmg, mana_cost FROM Crips'
+                       f' WHERE mana_cost < {mana}')
         summon_data = cursor.fetchall()
         if summon_data:
             count = len(summon_data)

@@ -34,18 +34,22 @@ def random_choice(choice):
 
 
 while game != 0:
+    mana_use = False
     mana_plus = 0
-    crips = []
     stack = 0
     turn = 0
     max_crips = 2
     multiplayer = 0
-    mana_use = False
     while multiplayer not in [1, 2, 3, 4]:
         print(' Выберите колличество игроков(максимум 4)')
         multiplayer = int(input(' '))
     names, players, nahl = player_func(multiplayer)
     hp_pl = 0
+    playerses = players.copy()
+    players = [list(player) for player in playerses]
+    for player in players:
+        player.append(mana_use)
+        player.append([])
 
     for i in players:
         hp_pl += i[1]
@@ -57,8 +61,6 @@ while game != 0:
         enemy_dmg = round(enemy[1] * 1.5 ** float(len(players) - 1), 0)
         enemy_hp = round(enemy[2] * 1.5 ** float(len(players) - 1), 0)
         event = random.randint(1, 1000)
-        playerses = players.copy()
-        players = [list(player) for player in playerses]
         turn += 1 / len(players)
         for player in players:
             if live_fade is True:
@@ -70,15 +72,15 @@ while game != 0:
                     print(' Вы попали в лагерь\n',
                           'Вы можете подлечится 1 или уйти 2')
                     choice_lager = int(input(' '))
-                    turn += 1
                     if choice_lager == 1:
-                        if player[1] != player[4]:
+                        if player[1] + 10 >= player[4]:
                             player[1] = player[4]
                         else:
                             player[1] += random.randint(5, 10)
         else:
             while enemy_hp > 0 and hp_pl > 0:
                 name = 0
+                damage = True
                 for player in players:
                     name += 1
                     if enemy_hp <= 0:
@@ -89,14 +91,17 @@ while game != 0:
                     if hp_pl <= 0:
                         break
                     os.system('clear')
-                    if mana_use:
-                        pass
+                    if player[-2]:
+                        player[-2] = False
                     else:
                         if player[0] == 'Призыватель':
                             mana_plus = 5
-                        if player[0] == 'Маг':
+                        elif player[0] == 'Маг':
                             mana_plus = 1
-                        player[3] += mana_plus
+                        if player[3] + mana_plus >= player[5]:
+                            player[3] = player[5]
+                        else:
+                            player[3] += mana_plus
                     if player[1] > 0:
                         check = True
                         while check:
@@ -134,7 +139,8 @@ while game != 0:
                                              ' 2 - защищаться\n'
                                              ' 3 - посмотреть инвентарь\n'
                                              ' 4 - рандом\n'
-                                             ' 5 - возможность встать в стойку')
+                                             ' 5 - возможность встать в'
+                                             ' стойку')
                             elif player[0] == 'Призыватель':
                                 message = (f' Ваше имя: {names[name-1]}\n'
                                            f' Твой класс:{player[0]}\n'
@@ -146,6 +152,17 @@ while game != 0:
                                              ' 3 - посмотреть инвентарь\n'
                                              ' 4 - рандом\n'
                                              ' 5 - посмотреть крипов')
+                            elif player[0] == 'Хиллер':
+                                message = (f' Ваше имя: {names[name-1]}\n'
+                                           f' Твой класс:{player[0]}\n'
+                                           f' Здоровье:{player[1]}\n'
+                                           f' Мана:{player[3]}\n')
+                                message_1 = (' Выберите действие\n'
+                                             ' 1 - полечить союзника\n'
+                                             ' 2 - полечить себя\n'
+                                             ' 3 - посмотреть инвентарь\n'
+                                             ' 4 - рандом\n'
+                                             ' 5 - полечить союзников')
                             else:
                                 message = (f' Ваше имя: {names[name-1]}\n'
                                            f' Твой класс:{player[0]}\n'
@@ -164,6 +181,8 @@ while game != 0:
                                 print(f' Вы встретили: {enemy_name}\n',
                                       f'Здоровья у противника: {enemy_hp}\n')
                             print(message_1)
+                            if enemy_hp <= 0:
+                                break
                             choice = int(input(' '))
                             help_choice = False
                             defence = 0
@@ -175,18 +194,20 @@ while game != 0:
                                  defence,
                                  player[3],
                                  stack,
-                                 crips,
+                                 player[-1],
                                  check,
-                                 mana_use) = choice_1(choice,
-                                                      enemy_hp,
-                                                      player[1],
-                                                      defence,
-                                                      player[3],
-                                                      stack,
-                                                      player,
-                                                      crips,
-                                                      max_crips,
-                                                      True)
+                                 player[-2],
+                                 players) = choice_1(choice,
+                                                     enemy_hp,
+                                                     player[1],
+                                                     defence,
+                                                     player[3],
+                                                     stack,
+                                                     player,
+                                                     player[-1],
+                                                     max_crips,
+                                                     players,
+                                                     True)
                             else:
                                 (choice,
                                  enemy_hp,
@@ -194,34 +215,53 @@ while game != 0:
                                  defence,
                                  player[3],
                                  stack,
-                                 crips,
+                                 player[-1],
                                  check,
-                                 mana_use) = choice_1(choice,
-                                                      enemy_hp,
-                                                      player[1],
-                                                      defence,
-                                                      player[3],
-                                                      stack,
-                                                      player,
-                                                      crips,
-                                                      max_crips)
+                                 player[-2],
+                                 players) = choice_1(choice,
+                                                     enemy_hp,
+                                                     player[1],
+                                                     defence,
+                                                     player[3],
+                                                     stack,
+                                                     player,
+                                                     player[-1],
+                                                     max_crips,
+                                                     players)
                         action_enemy = random.randint(1, 100)
-                        cripses = crips.copy()
-                        crips = [list(crip) for crip in cripses]
+                        cripses = player[-1].copy()
+                        player[-1] = [list(crip) for crip in cripses]
+                        for played in players:
+                            if played[0] == 'Воин':
+                                have_war = True
+                            else:
+                                have_war = False
                         if action_enemy >= 30:
                             if enemy_hp > 0:
-                                defence -= enemy_dmg
-                                if player[0] == 'Призыватель' and crips:
-                                    crips[0][2] -= enemy_dmg
+                                if have_war:
+                                    if player[0] == 'Воин':
+                                        if defence >= 0:
+                                            player[1] = player[1]
+                                        else:
+                                            player[1] += defence
                                 else:
-                                    if defence >= 0:
-                                        player[1] = player[1]
-                                    else:
-                                        player[1] += defence
+                                    if damage:
+                                        defence -= enemy_dmg
+                                        if (player[0] == 'Призыватель'
+                                                and player[-1]):
+                                            player[-1][0][-2] -= enemy_dmg
+                                        else:
+                                            if defence >= 0:
+                                                player[1] = player[1]
+                                            else:
+                                                player[1] += defence
+                                        a = random.randint(1, 10)
+                                        if a < 9:
+                                            damage = False
                         n = 0
-                        for crip in crips:
+                        for crip in player[-1]:
                             if crip[2] <= 0:
-                                crips.pop(n)
+                                player[-1].pop(n)
                             n += 1
     else:
         print(f' Вы проиграли. Тебя убили на {int(turn)} ходу')
