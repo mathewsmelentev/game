@@ -40,6 +40,7 @@ while game != 0:
     turn = 0
     max_crips = 2
     multiplayer = 0
+    death = [['1']]
     while multiplayer not in [1, 2, 3, 4]:
         print(' Выберите колличество игроков(максимум 4)')
         multiplayer = int(input(' '))
@@ -47,6 +48,7 @@ while game != 0:
     hp_pl = 0
     playerses = players.copy()
     players = [list(player) for player in playerses]
+    playerses = [list(player) for player in playerses]
     for player in players:
         player.append(mana_use)
         player.append([])
@@ -54,14 +56,14 @@ while game != 0:
     for i in players:
         hp_pl += i[1]
 
-    while hp_pl > 0:
+    while playerses:
         live_fade, unknown_enemies, unknown_yourself = curses()
         enemy = random.choice(enemy_func())
         enemy_name = enemy[0]
-        enemy_dmg = round(enemy[1] * 1.5 ** float(len(players) - 1), 0)
-        enemy_hp = round(enemy[2] * 1.5 ** float(len(players) - 1), 0)
+        enemy_dmg = round(enemy[1] * 1.2 ** float(len(players) - 1), 0)
+        enemy_hp = round(enemy[2] * 1.7 ** float(len(players) - 1), 0)
         event = random.randint(1, 1000)
-        turn += 1 / len(players)
+        turn += 1
         for player in players:
             if live_fade is True:
                 player[1] -= 2
@@ -78,7 +80,7 @@ while game != 0:
                         else:
                             player[1] += random.randint(5, 10)
         else:
-            while enemy_hp > 0 and hp_pl > 0:
+            while enemy_hp > 0 and playerses:
                 name = 0
                 damage = True
                 for player in players:
@@ -86,9 +88,7 @@ while game != 0:
                     if enemy_hp <= 0:
                         break
                     hp_pl = 0
-                    for i in players:
-                        hp_pl += i[1]
-                    if hp_pl <= 0:
+                    if not players:
                         break
                     os.system('clear')
                     if player[-2]:
@@ -98,6 +98,8 @@ while game != 0:
                             mana_plus = 5
                         elif player[0] == 'Маг':
                             mana_plus = 1
+                        elif player[0] == 'Хиллер':
+                            mana_plus = 7
                         if player[3] + mana_plus >= player[5]:
                             player[3] = player[5]
                         else:
@@ -231,19 +233,28 @@ while game != 0:
                         action_enemy = random.randint(1, 100)
                         cripses = player[-1].copy()
                         player[-1] = [list(crip) for crip in cripses]
+                        have_war = False
                         for played in players:
-                            if played[0] == 'Воин':
-                                have_war = True
-                            else:
-                                have_war = False
+                            for dead in death:
+                                if (played[0] == 'Воин'
+                                        and player[0] != dead[0]):
+                                    have_war = True
+                        pl = players.index(player)
                         if action_enemy >= 30:
                             if enemy_hp > 0:
                                 if have_war:
+                                    defence -= enemy_dmg
                                     if player[0] == 'Воин':
                                         if defence >= 0:
                                             player[1] = player[1]
                                         else:
                                             player[1] += defence
+                                            if player[1] < 0:
+                                                death.append(
+                                                    playerses.pop(
+                                                        pl
+                                                        )
+                                                    )
                                 else:
                                     if damage:
                                         defence -= enemy_dmg
@@ -255,6 +266,12 @@ while game != 0:
                                                 player[1] = player[1]
                                             else:
                                                 player[1] += defence
+                                                if player[1] < 0:
+                                                    death.append(
+                                                        playerses.pop(
+                                                            pl
+                                                            )
+                                                        )
                                         a = random.randint(1, 10)
                                         if a < 9:
                                             damage = False

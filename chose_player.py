@@ -3,6 +3,7 @@ import time
 import os
 
 from summoner import summon
+from check import checkin
 
 
 def player_message(datas):
@@ -62,10 +63,18 @@ def choice_1(choice,
             hp += int(round(player[2] / 2, 0))
         elif player[0] == 'Хиллер':
             hillers = []
+            hp_plus = random.randint(5, 7)
             for hiller in players:
-                if not hiller == player:
+                if (not hiller == player
+                        and checkin(
+                            hiller[1],
+                            hiller[4],
+                            hp_plus,
+                            False
+                        )):
                     hillers.append(hiller)
             try:
+                print(hillers)
                 rand_pl = random.randint(0, hillers.index(hillers[-1]))
             except ValueError:
                 print(' Нет игроков, кого можно, нужно полечить')
@@ -74,33 +83,41 @@ def choice_1(choice,
                 print(' Нет игроков, кого можно, нужно полечить')
                 err = True
             if not err:
-                print(hillers)
-                for hiller in hillers:
-                    time.sleep(3)
-                    if int(hiller[1]) == int(hiller[4]):
-                        hillers = hillers.pop(hillers.index(hiller))
-                if hillers:
-                    hp_plus = random.randint(5, 7)
-                    mana_plus = random.randint(2, 6)
-                    if not (players[rand_pl][1] == players[rand_pl][4]
-                            and
-                            players[rand_pl][1] + mana_plus ==
-                            players[rand_pl][4]):
-                        players[rand_pl][1] += hp_plus
+                if mana - 5 > 0:
+                    hillers = [hillers.pop(
+                        hillers.index(hillers[rand_pl]))]
+                    rand_pl = 0
+                    if hillers:
+                        mana_plus = random.randint(2, 6)
+                        pl = players.index(hillers[rand_pl])
+                        print(hillers)
+                        if (checkin(hillers[rand_pl][1],
+                                    hillers[rand_pl][4],
+                                    hp_plus,
+                                    False)
+                                and int(hillers[rand_pl][1]) > 0):
+                            players[pl][1] += hp_plus
+                            print(f' Вы вылечили игрока с классом'
+                                  f' {hillers[rand_pl][0]} на {hp_plus}'
+                                  ' единиц')
+                            mana -= 5
+                            mana_use = True
+                        else:
+                            if player[1] > 0:
+                                players[pl][1] = players[pl][4]
+                            print(' Некого лечить')
+                        if checkin(hillers[rand_pl][3],
+                                   hillers[rand_pl][5],
+                                   mana_plus,
+                                   False):
+                            players[pl][3] += mana_plus
+                        else:
+                            players[pl][3] += hillers[rand_pl][5]
+                        mana -= 5
+                        mana_use = True
                     else:
-                        players[rand_pl][1] = players[rand_pl][4]
-                    if not (players[rand_pl][3] == players[rand_pl][5]
-                            and
-                            players[rand_pl][3] + mana_plus ==
-                            players[rand_pl][5]):
-                        players[rand_pl][3] += mana_plus
-                    print(f' Вы вылечили игрока с классом'
-                          f' {players[rand_pl][0]} на {hp_plus} единиц')
-                else:
-                    print(' Нет игроков, кого можно, нужно полечить')
-            mana -= 5
+                        print(' Нет игроков, кого можно, нужно полечить')
             value = True
-            mana_use = True
         else:
             enemy_hp -= player[2]
         if value is False:
@@ -108,10 +125,11 @@ def choice_1(choice,
     elif choice == 2:
         defence = random.randint(3, 10)
         if player[0] == 'Хиллер':
-            if not player[1] == player[4]:
-                hp_plus = random.randint(6, 8)
-                player[1] += hp_plus
-                print(f' Вы вылечились на {hp_plus} единиц')
+            if checkin(player[1], player[4], hp_plus, False):
+                if checkin(player[3], player[5], 6, True):
+                    hp_plus = random.randint(6, 8)
+                    player[1] += hp_plus
+                    print(f' Вы вылечились на {hp_plus} единиц')
             else:
                 print(' Ваше здоровье и так полное')
             mana -= 6
@@ -154,13 +172,19 @@ def choice_1(choice,
                 check = True
         elif player[0] == 'Хиллер':
             hill = random.randint(5, 9)
-            for hill_target in players:
-                if (hill_target[1] == hill_target[4]
-                        and hill_target + hill >= hill_target[4]):
-                    hill_target[1] += hill
-            mana -= 9
-            print(f' Все были вылечены на {hill}')
-            mana_use = True
+            if checkin(player[3],
+                       player[5],
+                       9,
+                       True):
+                for hill_target in players:
+                    if checkin(hill_target[1],
+                               hill_target[4],
+                               hill,
+                               False):
+                        hill_target[1] += hill
+                mana -= 9
+                print(f' Все были вылечены на {hill}')
+                mana_use = True
 
     elif choice == 3:
         os.system('clear')

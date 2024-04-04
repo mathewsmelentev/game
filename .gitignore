@@ -1,4 +1,4 @@
 game_without_multiplayer.py
 
 venv/
-__pycache__
+__pycache__/
