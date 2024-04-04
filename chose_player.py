@@ -164,7 +164,12 @@ def choice_1(choice,
             print(' Выберите, что будут делать крипы\n',
                   '1 - атаковать\n',
                   '0 - выйти')
-            crip_choice = int(input(' '))
+            a = True
+            while a:
+                try:
+                    crip_choice = int(input(' '))
+                except ValueError:
+                    a = True
             if crip_choice == 1:
                 for crip in crips:
                     enemy_hp -= crip[2]

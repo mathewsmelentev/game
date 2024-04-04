@@ -7,6 +7,7 @@ from db_work import (enemy_func,
                      records_get,
                      player_func)
 from chose_player import choice_1
+from player_message import message
 
 game = 1
 
@@ -42,8 +43,14 @@ while game != 0:
     multiplayer = 0
     death = [['1']]
     while multiplayer not in [1, 2, 3, 4]:
-        print(' Выберите колличество игроков(максимум 4)')
-        multiplayer = int(input(' '))
+        print(' Выберите колличество игроков(от 1 до 4)')
+        a = True
+        while a:
+            try:
+                multiplayer = int(input(' '))
+                a = False
+            except ValueError:
+                a = True
     names, players, nahl = player_func(multiplayer)
     hp_pl = 0
     playerses = players.copy()
@@ -80,7 +87,7 @@ while game != 0:
                         else:
                             player[1] += random.randint(5, 10)
         else:
-            while enemy_hp > 0 and playerses:
+            while enemy_hp > 0 and players:
                 name = 0
                 damage = True
                 for player in players:
@@ -108,84 +115,28 @@ while game != 0:
                         check = True
                         while check:
                             check = False
-                            if nahl is True or unknown_yourself is True:
-                                message = (f' Ваше имя: {names[name-1]}\n'
-                                           ' Твой класс:?\n'
-                                           ' Здоровье:?\n'
-                                           ' Мана:?\n'
-                                           ' Стак:?\n')
-                                message_1 = (' Выберите действие\n'
-                                             ' 1 - удар?\n'
-                                             ' 2 - защищаться?\n'
-                                             ' 3 - посмотреть инвентарь?\n'
-                                             ' 4 - рандом?\n'
-                                             ' 5 - ?')
-                            elif player[0] == 'Маг':
-                                message = (f' Ваше имя: {names[name-1]}\n'
-                                           f' Твой класс:{player[0]}\n'
-                                           f' Здоровье:{player[1]}\n'
-                                           f' Мана:{player[3]}\n')
-                                message_1 = (' Выберите действие\n'
-                                             ' 1 - удар(если нет маны,'
-                                             ' делится на 2)\n'
-                                             ' 2 - защищаться\n'
-                                             ' 3 - посмотреть инвентарь\n'
-                                             ' 4 - рандом')
-                            elif player[0] == 'Рога':
-                                message = (f' Ваше имя: {names[name-1]}\n'
-                                           f' Твой класс:{player[0]}\n'
-                                           f' Здоровье:{player[1]}\n'
-                                           f' Стак:?\n')
-                                message_1 = (' Выберите действие\n'
-                                             ' 1 - удар\n'
-                                             ' 2 - защищаться\n'
-                                             ' 3 - посмотреть инвентарь\n'
-                                             ' 4 - рандом\n'
-                                             ' 5 - возможность встать в'
-                                             ' стойку')
-                            elif player[0] == 'Призыватель':
-                                message = (f' Ваше имя: {names[name-1]}\n'
-                                           f' Твой класс:{player[0]}\n'
-                                           f' Здоровье:{player[1]}\n'
-                                           f' Мана:{player[3]}\n')
-                                message_1 = (' Выберите действие\n'
-                                             ' 1 - призвать крипа\n'
-                                             ' 2 - защищаться\n'
-                                             ' 3 - посмотреть инвентарь\n'
-                                             ' 4 - рандом\n'
-                                             ' 5 - посмотреть крипов')
-                            elif player[0] == 'Хиллер':
-                                message = (f' Ваше имя: {names[name-1]}\n'
-                                           f' Твой класс:{player[0]}\n'
-                                           f' Здоровье:{player[1]}\n'
-                                           f' Мана:{player[3]}\n')
-                                message_1 = (' Выберите действие\n'
-                                             ' 1 - полечить союзника\n'
-                                             ' 2 - полечить себя\n'
-                                             ' 3 - посмотреть инвентарь\n'
-                                             ' 4 - рандом\n'
-                                             ' 5 - полечить союзников')
-                            else:
-                                message = (f' Ваше имя: {names[name-1]}\n'
-                                           f' Твой класс:{player[0]}\n'
-                                           f' Здоровье:{player[1]}\n')
-                                message_1 = (' Выберите действие\n'
-                                             ' 1 - удар\n'
-                                             ' 2 - защищаться\n'
-                                             ' 3 - посмотреть инвентарь\n'
-                                             ' 4 - рандом')
-
-                            print(message)
+                            message_1, message_2 = message(player,
+                                                           names,
+                                                           name,
+                                                           nahl,
+                                                           unknown_yourself)
+                            print(message_1)
                             if unknown_enemies is True:
                                 print(' Вы встретили: ?\n',
                                       'Здоровья у противника: ?\n')
                             else:
                                 print(f' Вы встретили: {enemy_name}\n',
                                       f'Здоровья у противника: {enemy_hp}\n')
-                            print(message_1)
+                            print(message_2)
                             if enemy_hp <= 0:
                                 break
-                            choice = int(input(' '))
+                            a = True
+                            while a:
+                                try:
+                                    choice = int(input(' '))
+                                    a = False
+                                except ValueError:
+                                    a = True
                             help_choice = False
                             defence = 0
                             if choice == 4:
@@ -251,7 +202,7 @@ while game != 0:
                                             player[1] += defence
                                             if player[1] < 0:
                                                 death.append(
-                                                    playerses.pop(
+                                                    players.pop(
                                                         pl
                                                         )
                                                     )
@@ -268,7 +219,7 @@ while game != 0:
                                                 player[1] += defence
                                                 if player[1] < 0:
                                                     death.append(
-                                                        playerses.pop(
+                                                        players.pop(
                                                             pl
                                                             )
                                                         )

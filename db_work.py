@@ -1,5 +1,6 @@
 import sqlite3
 import random
+import os
 
 from chose_player import player_message
 
@@ -53,15 +54,28 @@ def get_data():
 
 
 def player_func(multiplayer):
+    os.system('clear')
     nahl = False
     names = []
     players = []
     for n in range(multiplayer):
         print(' Введите имя игрока:')
-        names.append(input(' '))
+        a = True
+        while a:
+            try:
+                names.append(input(' '))
+                a = False
+            except ValueError:
+                a = True
         message, data = player_message(get_data())
         print(message)
-        class_player = int(input(' '))
+        a = True
+        while a:
+            try:
+                class_player = int(input(' '))
+                a = False
+            except ValueError:
+                a = True
         if class_player == data:
             class_player = random.randint(1, 5)
             # отвечает за скрытие ника и класса
