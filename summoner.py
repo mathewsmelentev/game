@@ -2,7 +2,10 @@ import sqlite3
 import random
 
 
-def summon(count_summons, max_count_summons, mana):
+def summon(count_summons: int,
+           max_count_summons: int,
+           mana: int
+           ) -> list:
     if count_summons == max_count_summons:
         return 5, mana
     else:

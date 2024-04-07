@@ -1,6 +1,10 @@
-def message(player, names, name, nahl, unknown_yourself):
+def message(player: list,
+            name: str,
+            nahl: bool,
+            unknown_yourself: bool
+            ) -> str:
     if nahl is True or unknown_yourself is True:
-        message = (f' Ваше имя: {names[name-1]}\n'
+        message = (f' Ваше имя: {name}\n'
                    ' Твой класс:?\n'
                    ' Здоровье:?\n'
                    ' Мана:?\n'
@@ -12,7 +16,7 @@ def message(player, names, name, nahl, unknown_yourself):
                      ' 4 - рандом?\n'
                      ' 5 - ?')
     elif player[0] == 'Маг':
-        message = (f' Ваше имя: {names[name-1]}\n'
+        message = (f' Ваше имя: {name}\n'
                    f' Твой класс:{player[0]}\n'
                    f' Здоровье:{player[1]}\n'
                    f' Мана:{player[3]}\n')
@@ -23,7 +27,7 @@ def message(player, names, name, nahl, unknown_yourself):
                      ' 3 - посмотреть инвентарь\n'
                      ' 4 - рандом')
     elif player[0] == 'Рога':
-        message = (f' Ваше имя: {names[name-1]}\n'
+        message = (f' Ваше имя: {name}\n'
                    f' Твой класс:{player[0]}\n'
                    f' Здоровье:{player[1]}\n'
                    f' Стак:?\n')
@@ -35,7 +39,7 @@ def message(player, names, name, nahl, unknown_yourself):
                      ' 5 - возможность встать в'
                      ' стойку')
     elif player[0] == 'Призыватель':
-        message = (f' Ваше имя: {names[name-1]}\n'
+        message = (f' Ваше имя: {name}\n'
                    f' Твой класс:{player[0]}\n'
                    f' Здоровье:{player[1]}\n'
                    f' Мана:{player[3]}\n')
@@ -46,7 +50,7 @@ def message(player, names, name, nahl, unknown_yourself):
                      ' 4 - рандом\n'
                      ' 5 - посмотреть крипов')
     elif player[0] == 'Хиллер':
-        message = (f' Ваше имя: {names[name-1]}\n'
+        message = (f' Ваше имя: {name}\n'
                    f' Твой класс:{player[0]}\n'
                    f' Здоровье:{player[1]}\n'
                    f' Мана:{player[3]}\n')
@@ -57,7 +61,7 @@ def message(player, names, name, nahl, unknown_yourself):
                      ' 4 - рандом\n'
                      ' 5 - полечить союзников')
     elif player[0] == 'Бард':
-        message = (f' Ваше имя: {names[name-1]}\n'
+        message = (f' Ваше имя: {name}\n'
                    f' Твой класс:{player[0]}\n'
                    f' Здоровье:{player[1]}\n'
                    f' Мана:{player[3]}\n')
@@ -67,8 +71,28 @@ def message(player, names, name, nahl, unknown_yourself):
                      ' 3 - посмотреть инвентарь\n'
                      ' 4 - рандом\n'
                      ' 5 - повысить всем регенерацию маны')
+    elif player[0] == 'Шаман':
+        message = (f' Ваше имя: {name}\n'
+                   f' Твой класс:{player[0]}\n'
+                   f' Здоровье:{player[1]}\n'
+                   f' Мана:{player[3]}\n')
+        message_1 = (' Выберите действие\n'
+                     ' 1 - понизить урон противнику\n'
+                     ' 2 - защититься\n'
+                     ' 3 - посмотреть инвентарь\n'
+                     ' 4 - рандом\n')
+    elif player[0] == 'Чернокнижник':
+        message = (f' Ваше имя: {name}\n'
+                   f' Твой класс:{player[0]}\n'
+                   f' Здоровье:{player[1]}\n'
+                   f' Мана:{player[3]}\n')
+        message_1 = (' Выберите действие\n'
+                     ' 1 - удар(за хп, ты от этого можешь сдохнуть)\n'
+                     ' 2 - востановить здоровье\n'
+                     ' 3 - посмотреть инвентарь\n'
+                     ' 4 - рандом\n')
     else:
-        message = (f' Ваше имя: {names[name-1]}\n'
+        message = (f' Ваше имя: {name}\n'
                    f' Твой класс:{player[0]}\n'
                    f' Здоровье:{player[1]}\n')
         message_1 = (' Выберите действие\n'

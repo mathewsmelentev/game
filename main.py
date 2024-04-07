@@ -8,11 +8,12 @@ from db_work import (enemy_func,
                      player_func)
 from chose_player import choice_1
 from player_message import message
+from check import checkin
 
 game = 1
 
 
-def curses():
+def curses() -> int:
     live_fade = False
     unknown_enemies = False
     unknown_yourself = False
@@ -29,7 +30,7 @@ def curses():
     return (live_fade, unknown_enemies, unknown_yourself)
 
 
-def random_choice(choice):
+def random_choice(choice: int) -> int:
     choice = random.randint(1, 2)
     return (choice)
 
@@ -55,19 +56,40 @@ while game != 0:
     hp_pl = 0
     playerses = players.copy()
     players = [list(player) for player in playerses]
-    playerses = [list(player) for player in playerses]
+    playerses = players.copy()
+    # характеристики игрока
+    # -15 название класса 0,
+    # -14 хп 1,
+    # -13 урон 2,
+    # -12 мана 3,
+    # -11 максимальное хп 4 ,
+    # -10 максимальная мана 5,
+    # -9 имя игрока 6
+    # -8 стак урон апа 7,
+    # -7 время урон апа 8,
+    # -6 стак рег мана апа 9,
+    # -5 время рег мана апа 10,
+    # -4 стак рег хп апа 11,
+    # -3 время рег хп 12,
+    # -2 использовал ману? 13,
+    # -1 крипы 14
+    n = 0
     for player in players:
+        player.append(names[n])
+        n += 1
+        for i in range(6):
+            player.append(0)
         player.append(mana_use)
         player.append([])
 
     for i in players:
         hp_pl += i[1]
 
-    while playerses:
+    while players:
         live_fade, unknown_enemies, unknown_yourself = curses()
         enemy = random.choice(enemy_func())
         enemy_name = enemy[0]
-        enemy_dmg = round(enemy[1] * 1.2 ** float(len(players) - 1), 0)
+        enemy_dmg = round(enemy[1] * 1.3 ** float(len(players) - 1), 0)
         enemy_hp = round(enemy[2] * 1.7 ** float(len(players) - 1), 0)
         event = random.randint(1, 1000)
         turn += 1
@@ -88,16 +110,44 @@ while game != 0:
                             player[1] += random.randint(5, 10)
         else:
             while enemy_hp > 0 and players:
-                name = 0
                 damage = True
                 for player in players:
-                    name += 1
                     if enemy_hp <= 0:
                         break
                     hp_pl = 0
                     if not players:
                         break
                     os.system('clear')
+                    if player[-7] > 0:
+                        player[-7] -= 1
+                    else:
+                        player[2] /= 1.25 ** player[-8]
+                        player[-8] = 0
+                    if player[-3] > 0:
+                        player[-3] -= 1
+                        if checkin(
+                                player[1],
+                                player[4],
+                                2 * player[-4],
+                                False
+                                ):
+                            player[1] += 2 * player[-4]
+                        else:
+                            player[1] = player[4]
+                    else:
+                        player[-4] = 0
+                    if player[-5] > 0:
+                        if checkin(
+                                player[2],
+                                player[5],
+                                4 * player[-6],
+                                False
+                                ):
+                            player[2] += 4 * player[-6]
+                        else:
+                            player[2] = player[5]
+                    else:
+                        player[-6] = 0
                     if player[-2]:
                         player[-2] = False
                     else:
@@ -107,6 +157,10 @@ while game != 0:
                             mana_plus = 1
                         elif player[0] == 'Хиллер':
                             mana_plus = 7
+                        elif player[0] == 'Бард':
+                            mana_plus = 6
+                        elif player[0] == 'Шаман':
+                            mana_plus = 3
                         if player[3] + mana_plus >= player[5]:
                             player[3] = player[5]
                         else:
@@ -116,8 +170,7 @@ while game != 0:
                         while check:
                             check = False
                             message_1, message_2 = message(player,
-                                                           names,
-                                                           name,
+                                                           player[-9],
                                                            nahl,
                                                            unknown_yourself)
                             print(message_1)
@@ -150,17 +203,19 @@ while game != 0:
                                  player[-1],
                                  check,
                                  player[-2],
-                                 players) = choice_1(choice,
-                                                     enemy_hp,
-                                                     player[1],
-                                                     defence,
-                                                     player[3],
-                                                     stack,
-                                                     player,
-                                                     player[-1],
-                                                     max_crips,
-                                                     players,
-                                                     True)
+                                 players,
+                                 enemy_dmg) = choice_1(choice,
+                                                       enemy_hp,
+                                                       player[1],
+                                                       defence,
+                                                       player[3],
+                                                       stack,
+                                                       player,
+                                                       player[-1],
+                                                       max_crips,
+                                                       players,
+                                                       enemy_dmg,
+                                                       True)
                             else:
                                 (choice,
                                  enemy_hp,
@@ -171,16 +226,18 @@ while game != 0:
                                  player[-1],
                                  check,
                                  player[-2],
-                                 players) = choice_1(choice,
-                                                     enemy_hp,
-                                                     player[1],
-                                                     defence,
-                                                     player[3],
-                                                     stack,
-                                                     player,
-                                                     player[-1],
-                                                     max_crips,
-                                                     players)
+                                 players,
+                                 enemy_dmg) = choice_1(choice,
+                                                       enemy_hp,
+                                                       player[1],
+                                                       defence,
+                                                       player[3],
+                                                       stack,
+                                                       player,
+                                                       player[-1],
+                                                       max_crips,
+                                                       players,
+                                                       enemy_dmg)
                         action_enemy = random.randint(1, 100)
                         cripses = player[-1].copy()
                         player[-1] = [list(crip) for crip in cripses]
@@ -200,7 +257,7 @@ while game != 0:
                                             player[1] = player[1]
                                         else:
                                             player[1] += defence
-                                            if player[1] < 0:
+                                            if player[1] <= 0:
                                                 death.append(
                                                     players.pop(
                                                         pl
@@ -231,13 +288,15 @@ while game != 0:
                             if crip[2] <= 0:
                                 player[-1].pop(n)
                             n += 1
+                    else:
+                        death.append(players.pop(players.index(player)))
     else:
         print(f' Вы проиграли. Тебя убили на {int(turn)} ходу')
         time.sleep(2)
     player = ''
-    for i in players:
+    for i in playerses:
         player += f'{i[0]} '
-        record_update(int(turn), player)
+    record_update(turn, player)
 
     records = records_get()
 

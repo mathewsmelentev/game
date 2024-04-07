@@ -1,16 +1,19 @@
 import sqlite3
 import random
 import os
+import time
 
 from chose_player import player_message
 
-connection = sqlite3.connect('mygame.sqlite3')
-cursor = connection.cursor()
 
-
-def enemy_func():
+def connect() -> list:
     connection = sqlite3.connect('mygame.sqlite3')
     cursor = connection.cursor()
+    return connection, cursor
+
+
+def enemy_func() -> list:
+    connection, cursor = connect()
     cursor.execute('SELECT * FROM Enemies')
     enemy_all = cursor.fetchall()
     enemy_id = random.randint(1, len(enemy_all))
@@ -19,41 +22,39 @@ def enemy_func():
     return enemy
 
 
-def class_func(choice):
-    connection = sqlite3.connect('mygame.sqlite3')
-    cursor = connection.cursor()
+def class_func(choice: int) -> list:
+    connection, cursor = connect()
     cursor.execute('SELECT name, hp, dmg, mana, max_hp, max_mana FROM Classes'
                    f' WHERE id = {choice}')
     pl_class = cursor.fetchall()
     return pl_class[0]
 
 
-def record_update(turn, pl_class):
-    connection = sqlite3.connect('mygame.sqlite3')
-    cursor = connection.cursor()
-    cursor.execute('INSERT INTO Records (record, class)'
-                   ' VALUES (?, ?)', (turn, pl_class))
+def record_update(turn: int, pl_class: str) -> None:
+    connection, cursor = connect()
+    resp = ('INSERT INTO Records (record, class)'
+            ' VALUES (?, ?)')
+    cursor.execute(resp, (turn, pl_class))
+    time.sleep(1)
     connection.commit()
 
 
-def records_get():
-    connection = sqlite3.connect('mygame.sqlite3')
-    cursor = connection.cursor()
+def records_get() -> list:
+    connection, cursor = connect()
     cursor.execute('SELECT record, class FROM Records'
                    ' ORDER BY record DESC')
     records = cursor.fetchall()
     return records
 
 
-def get_data():
-    connection = sqlite3.connect('mygame.sqlite3')
-    cursor = connection.cursor()
+def get_data() -> list:
+    connection, cursor = connect()
     cursor.execute('SELECT * FROM Classes')
     data = cursor.fetchall()
     return data
 
 
-def player_func(multiplayer):
+def player_func(multiplayer: int) -> list:
     os.system('clear')
     nahl = False
     names = []
@@ -84,4 +85,5 @@ def player_func(multiplayer):
     return names, players, nahl
 
 
+connection, cursor = connect()
 connection.close()
