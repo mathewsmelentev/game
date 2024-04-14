@@ -3,3 +3,5 @@
 python -m venv venv<br />
 source venv/Scripts/activate<br />
 python main.py
+P.S.
+Всё написано с использоавнием библиотек питона, ничего дополнительного качать не надо
