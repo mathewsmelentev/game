@@ -32,23 +32,26 @@ def choice_1(choice: int,
              value: bool = False,) -> list:
     check = False
     mana_use = False
+    dmg = player[2]
+    for inventory in player[-11]:
+        dmg += inventory[5]
     if choice == 1:
         damag = enemy_hp
         if player[0] == 'Маг':
             if mana >= 4:
-                enemy_hp -= player[2]
+                enemy_hp -= dmg
                 mana -= 4
                 mana_use = True
             else:
-                enemy_hp -= round(player[2]/2)
-        elif player[0] == 'Стрелок':
+                enemy_hp -= round(dmg/2)
+        elif player[0] == 'Стрелplayerок':
             crit_ch = random.randint(1, 10)
             if crit_ch <= 2:
-                enemy_hp -= player[2] * 3
+                enemy_hp -= dmg * 3
             else:
-                enemy_hp -= player[2]
+                enemy_hp -= dmg
         elif player[0] == 'Рога':
-            enemy_hp -= (player[2] + 4*stack)
+            enemy_hp -= (dmg + 4*stack)
         elif player[0] == 'Призыватель':
             crip, mana = summon(len(crips), max_crips, mana)
             if crip == 5:
@@ -59,12 +62,18 @@ def choice_1(choice: int,
                 mana_use = True
             value = True
         elif player[0] == 'Вампир':
-            enemy_hp -= player[2]
-            hp += int(round(player[2] / 2, 0))
+            enemy_hp -= dmg
+            if checkin(
+                    int(hp),
+                    int(player[4]),
+                    int(round(dmg / 2, 0)),
+                    False
+                    ):
+                hp += int(round(dmg / 2, 0))
         elif player[0] == 'Хиллер':
             if mana - 5 > 0:
                 os.system('clear')
-                hill = random.randint(player[2], player[2] + 2)
+                hill = random.randint(dmg, dmg + 2)
                 hillers = []
                 for played in players:
                     if played != player and played[1] > 0:
@@ -126,15 +135,15 @@ def choice_1(choice: int,
                 mana_use = True
             value = True
         elif player[0] == 'Чернокнижник':
-            enemy_hp -= player[2]
+            enemy_hp -= dmg
             hp -= 8
         else:
-            enemy_hp -= player[2]
+            enemy_hp -= dmg
         if value is False:
             print(f' Вы совершили атаку на {damag - enemy_hp} единиц')
     elif choice == 2:
         if player[0] == 'Хиллер':
-            hp_plus = random.randint(player[2] + 1, player[2] + 3)
+            hp_plus = random.randint(dmg + 1, dmg + 3)
             if checkin(player[1], player[4], hp_plus, False):
                 if checkin(player[3], player[5], 6, True):
                     player[1] += hp_plus
@@ -181,10 +190,18 @@ def choice_1(choice: int,
             stoika = False
             inv_ch = random.randint(1, 10)
             stack_ch = random.randint(1, 10)
-            if inv_ch <= 3:
+            for inventory in player[-11]:
+                if 'Браслет "Скрывающегося в тени"' in inventory:
+                    inv_ch_pl = 4
+                    stack_ch_pl = 6
+                    break
+                else:
+                    inv_ch_pl = 3
+                    stack_ch_pl = 5
+            if inv_ch <= inv_ch_pl:
                 stoika = True
                 defence = 100
-            if stack_ch <= 5:
+            if stack_ch <= stack_ch_pl:
                 stoika = True
                 stack += 1
             time.sleep(1)
@@ -213,7 +230,7 @@ def choice_1(choice: int,
             else:
                 check = True
         elif player[0] == 'Хиллер':
-            hill = random.randint(player[2], player[2] + 4)
+            hill = random.randint(dmg, dmg + 4)
             if checkin(player[3],
                        player[5],
                        9,
@@ -241,7 +258,11 @@ def choice_1(choice: int,
                 mana -= 5
     elif choice == 3:
         os.system('clear')
-        print('Это инвентарь, он пока не работает')
+        print('Такие предметы у тебя в инвентаре')
+        for inventory in player[-11]:
+            print(
+                f'{inventory[0]}\n'
+            )
         check = True
     time.sleep(2)
     os.system('clear')

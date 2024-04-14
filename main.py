@@ -5,7 +5,9 @@ import time
 from db_work import (enemy_func,
                      record_update,
                      records_get,
-                     player_func)
+                     player_func,
+                     boss_func,
+                     get_item_data)
 from chose_player import choice_1
 from player_message import message
 from check import checkin
@@ -54,27 +56,31 @@ while game != 0:
                 a = True
     names, players, nahl = player_func(multiplayer)
     hp_pl = 0
-    playerses = players.copy()
-    players = [list(player) for player in playerses]
-    playerses = players.copy()
+    playerses = [list(player) for player in players]
+    players = [list(player) for player in players]
     # характеристики игрока
-    # -15 название класса 0,
-    # -14 хп 1,
-    # -13 урон 2,
-    # -12 мана 3,
-    # -11 максимальное хп 4 ,
-    # -10 максимальная мана 5,
-    # -9 имя игрока 6
-    # -8 стак урон апа 7,
-    # -7 время урон апа 8,
-    # -6 стак рег мана апа 9,
-    # -5 время рег мана апа 10,
-    # -4 стак рег хп апа 11,
-    # -3 время рег хп 12,
-    # -2 использовал ману? 13,
-    # -1 крипы 14
+    # -17 название класса 0,
+    # -16 хп 1,
+    # -15 урон 2,
+    # -14 мана 3,
+    # -13 максимальное хп 4,
+    # -12 максимальная мана 5,
+    # -11 инвентарь 6,
+    # -10 максимальное значение крипов 7,
+    # -9 имя игрока 8,
+    # -8 стак урон апа 9,
+    # -7 время урон апа 10,
+    # -6 стак рег мана апа 11,
+    # -5 время рег мана апа 12,
+    # -4 стак рег хп апа 13,
+    # -3 время рег хп 14,
+    # -2 использовал ману? 15,
+    # -1 крипы 16
     n = 0
+    m = 0
     for player in players:
+        player.append([])
+        player.append(2)
         player.append(names[n])
         n += 1
         for i in range(6):
@@ -87,16 +93,39 @@ while game != 0:
 
     while players:
         live_fade, unknown_enemies, unknown_yourself = curses()
-        enemy = random.choice(enemy_func())
-        enemy_name = enemy[0]
-        enemy_dmg = round(enemy[1] * 1.3 ** float(len(players) - 1), 0)
-        enemy_hp = round(enemy[2] * 1.7 ** float(len(players) - 1), 0)
-        event = random.randint(1, 1000)
+        if turn % 7 != 0:
+            enemy = random.choice(enemy_func())
+            enemy_name = enemy[0]
+            enemy_dmg = round(enemy[1] * 1.1 ** float(len(players) - 1), 0)
+            enemy_hp = round(enemy[2] * 1.5 ** float(len(players) - 1), 0)
+            event = random.randint(1, 1000)
+        else:
+            enemy = random.choice(boss_func())
+            enemy_name = enemy[0]
+            enemy_dmg = round(enemy[1] * 1.3 ** float(len(players) - 1), 0)
+            enemy_hp = round(enemy[2] * 1.7 ** float(len(players) - 1), 0)
+            event = random.randint(1, 1000)
         turn += 1
+        na = 0
         for player in players:
+            hp_plus = 0
+            mana_up = 0
             if live_fade is True:
                 player[1] -= 2
-        if event <= 200:
+            for inventory in player[-11]:
+                hp_plus += inventory[2]
+            if playerses[na][4] + hp_plus != player[4]:
+                if playerses[na][4] + hp_plus > player[4]:
+                    hp_plus = 0 - (player[4] - playerses[na][4] - hp_plus)
+                    player[4] += hp_plus
+            for inventory in player[-11]:
+                mana_up += inventory[4]
+            if playerses[na][5] + hp_plus != player[5]:
+                if playerses[na][5] + hp_plus > player[5]:
+                    mana_up = 0 - (player[5] - playerses[na][5] - mana_up)
+                    player[5] += mana_up
+            na += 1
+        if event <= 200 and turn % 7 != 0:
             for player in players:
                 if player[1] > 0:
                     os.system('clear')
@@ -108,6 +137,25 @@ while game != 0:
                             player[1] = player[4]
                         else:
                             player[1] += random.randint(5, 10)
+        elif 200 < event < 300 and turn % 7 != 0:
+            mimic = random.randint(1, 100)
+            m += 1
+            for player in players:
+                os.system('clear')
+                if player[1] > 0:
+                    print(' Вы нашли сундук, вы хотите его открыть?',
+                          '(Да - 1, Нет - 2)')
+                    choice_chest = int(input(' '))
+                    if mimic <= 100:
+                        if choice_chest == 1:
+                            item_data = get_item_data(player[0], player[-11])
+                            player[-11].append(item_data)
+                    else:
+                        if choice_chest == 1:
+                            player[1] -= 3
+            os.system('clear')
+            if mimic > 50:
+                print('Это был мимик!')
         else:
             while enemy_hp > 0 and players:
                 damage = True
@@ -115,6 +163,8 @@ while game != 0:
                     if enemy_hp <= 0:
                         break
                     hp_pl = 0
+                    for inventory in player[-11]:
+                        player[1] += inventory[1]
                     if not players:
                         break
                     os.system('clear')
@@ -151,6 +201,10 @@ while game != 0:
                     if player[-2]:
                         player[-2] = False
                     else:
+                        try:
+                            mana_plus += player[-11][3]
+                        except IndexError:
+                            pass
                         if player[0] == 'Призыватель':
                             mana_plus = 5
                         elif player[0] == 'Маг':
@@ -174,6 +228,7 @@ while game != 0:
                                                            nahl,
                                                            unknown_yourself)
                             print(message_1)
+                            print(f' Колличество ходов: {turn}\n')
                             if unknown_enemies is True:
                                 print(' Вы встретили: ?\n',
                                       'Здоровья у противника: ?\n')
@@ -248,6 +303,8 @@ while game != 0:
                                         and player[0] != dead[0]):
                                     have_war = True
                         pl = players.index(player)
+                        for inventory in player[-11]:
+                            defence += inventory[7]
                         if action_enemy >= 30:
                             if enemy_hp > 0:
                                 if have_war:

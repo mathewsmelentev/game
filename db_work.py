@@ -22,6 +22,16 @@ def enemy_func() -> list:
     return enemy
 
 
+def boss_func() -> list:
+    connection, cursor = connect()
+    cursor.execute('SELECT * FROM Bosses')
+    boss_all = cursor.fetchall()
+    boss_id = random.randint(1, len(boss_all))
+    cursor.execute(f'SELECT name, dmg, hp FROM Bosses WHERE id = {boss_id}')
+    boss = cursor.fetchall()
+    return boss
+
+
 def class_func(choice: int) -> list:
     connection, cursor = connect()
     cursor.execute('SELECT name, hp, dmg, mana, max_hp, max_mana FROM Classes'
@@ -52,6 +62,21 @@ def get_data() -> list:
     cursor.execute('SELECT * FROM Classes')
     data = cursor.fetchall()
     return data
+
+
+def get_item_data(pl_class, inventory):
+    connection, cursor = connect()
+    cursor.execute(f'SELECT * FROM Items WHERE class = ?', (pl_class,))
+    lst_items = cursor.fetchall()
+    for item in lst_items:
+        for inv in inventory:
+            if item == inv:
+                item.pop(item.index(inv))
+    value = len(lst_items)
+    rand_item = random.randint(1, value)
+    item = list(lst_items[rand_item - 1])
+    item.pop(0)
+    return item
 
 
 def player_func(multiplayer: int) -> list:
