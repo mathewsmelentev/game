@@ -44,7 +44,7 @@ def choice_1(choice: int,
                 mana_use = True
             else:
                 enemy_hp -= round(dmg/2)
-        elif player[0] == 'Стрелок':
+        elif player[0] == 'Стрелplayerок':
             crit_ch = random.randint(1, 10)
             if crit_ch <= 2:
                 enemy_hp -= dmg * 3
@@ -64,15 +64,16 @@ def choice_1(choice: int,
         elif player[0] == 'Вампир':
             enemy_hp -= dmg
             if checkin(
-                    float(player[1]),
-                    float(player[4]),
-                    float(round(dmg / 2, 0)),
+                    int(hp),
+                    int(player[4]),
+                    int(round(dmg / 2, 0)),
                     False
                     ):
                 hp += int(round(dmg / 2, 0))
         elif player[0] == 'Хиллер':
             if mana - 5 > 0:
                 os.system('clear')
+                dmg = round(dmg, 0)
                 hill = random.randint(dmg, dmg + 2)
                 hillers = []
                 for played in players:
@@ -109,8 +110,8 @@ def choice_1(choice: int,
                     else:
                         hillers[choice2][1] = hillers[choice2][4]
                 except Exception:
-                    print(' Лечить некого')
-                print(f' Вы вылечили игрока на: {hill}')
+                    print('Лечить некого')
+                print(f'Вы вылечили игрока на: {hill}')
                 mana -= 5
                 mana_use = True
             value = True
@@ -127,7 +128,6 @@ def choice_1(choice: int,
                         played[-7] = 3
                 mana -= 7
                 mana_use = True
-                print(' Вы увеличили всем урон')
             value = True
         elif player[0] == 'Шаман':
             if mana - 14 >= 0:
@@ -165,7 +165,6 @@ def choice_1(choice: int,
                         played[-3] = 3
                 mana -= 9
                 mana_use = True
-                print(' Вы увеличили всем регенерацию хп')
             value = True
         elif player[0] == 'Чернокнижник':
             hill = random.randint(7, 9)
@@ -179,7 +178,7 @@ def choice_1(choice: int,
                     player[1] += hill
                     mana -= 7
                     mana_use = True
-                    print(f' Вы вылечились на {hill} единиц')
+                    print(f'Вы вылечились на {hill} единиц')
             value = True
         else:
             defence = random.randint(3, 10)
@@ -258,7 +257,6 @@ def choice_1(choice: int,
                         played[5] = 3
                 mana_use = True
                 mana -= 5
-                print(' Вы увеличили всем мана-регенерацию')
     elif choice == 3:
         os.system('clear')
         print('Такие предметы у тебя в инвентаре')

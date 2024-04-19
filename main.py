@@ -97,21 +97,35 @@ while game != 0:
         if turn % 7 != 0:
             enemy = random.choice(enemy_func())
             enemy_name = enemy[0]
-            enemy_dmg = round(enemy[1] * 1.1 ** float(len(players) - 1), 0)
-            enemy_hp = round(enemy[2] * 1.5 ** float(len(players) - 1), 0)
+            enemy_dmg = round(enemy[1] * 1.1 ** float(len(players) - 1)
+                              * 1.09 ** turn, 0)
+            enemy_hp = round(enemy[2] * 1.5 ** float(len(players) - 1)
+                             * 1.09 ** turn, 0)
             event = random.randint(1, 1000)
         else:
             enemy = random.choice(boss_func())
             enemy_name = enemy[0]
             enemy_dmg = round(enemy[1] * 1.3 ** float(len(players) - 1), 0)
             enemy_hp = round(enemy[2] * 1.7 ** float(len(players) - 1), 0)
-            event = random.randint(1, 1000)
+            event = random.randint(1, 100)
         na = 0
         for player in players:
             hp_plus = 0
             mana_up = 0
             if live_fade is True:
                 player[1] -= 2
+            for inventory in player[-11]:
+                hp_plus += inventory[2]
+            if playerses[na][4] + hp_plus != player[4]:
+                if playerses[na][4] + hp_plus > player[4]:
+                    hp_plus = 0 - (player[4] - playerses[na][4] - hp_plus)
+                    player[4] += hp_plus
+            for inventory in player[-11]:
+                mana_up += inventory[4]
+            if playerses[na][5] + hp_plus != player[5]:
+                if playerses[na][5] + hp_plus > player[5]:
+                    mana_up = 0 - (player[5] - playerses[na][5] - mana_up)
+                    player[5] += mana_up
             na += 1
         if event <= 200 and turn % 7 != 0:
             for player in players:
@@ -133,26 +147,17 @@ while game != 0:
                 if player[1] > 0:
                     print(' Вы нашли сундук, вы хотите его открыть?',
                           '(Да - 1, Нет - 2)')
-                    e = True
-                    while e:
-                        try:
-                            choice_chest = int(input(' '))
-                            e = False
-                        except ValueError:
-                            e = True
+                    choice_chest = int(input(' '))
                     if mimic <= 100:
                         if choice_chest == 1:
                             item_data = get_item_data(player[0], player[-11])
                             player[-11].append(item_data)
-                            player[4] += item_data[2]
-                            player[5] += item_data[4]
                     else:
                         if choice_chest == 1:
                             player[1] -= 3
             os.system('clear')
             if mimic > 50:
                 print('Это был мимик!')
-                time.sleep(1)
         else:
             while enemy_hp > 0 and players:
                 damage = True
@@ -160,6 +165,8 @@ while game != 0:
                     if enemy_hp <= 0:
                         break
                     hp_pl = 0
+                    for inventory in player[-11]:
+                        player[1] += inventory[1]
                     if not players:
                         break
                     os.system('clear')
@@ -197,8 +204,7 @@ while game != 0:
                         player[-2] = False
                     else:
                         try:
-                            for inventory in player[-11]:
-                                mana_plus += inventory[3]
+                            mana_plus += player[-11][3]
                         except IndexError:
                             pass
                         if player[0] == 'Призыватель':
@@ -230,6 +236,7 @@ while game != 0:
                                       'Здоровья у противника: ?\n')
                             else:
                                 print(f' Вы встретили: {enemy_name}\n',
+                                      f'Уровень: {turn - 1}\n',
                                       f'Здоровья у противника: {enemy_hp}\n')
                             print(message_2)
                             if enemy_hp <= 0:
