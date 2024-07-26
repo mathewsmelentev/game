@@ -36,8 +36,16 @@ def class_func(choice: int) -> list:
     connection, cursor = connect()
     cursor.execute('SELECT name, hp, dmg, mana, max_hp, max_mana FROM Classes'
                    f' WHERE id = {choice}')
-    pl_class = cursor.fetchall()
-    return pl_class[0]
+    pl_class = cursor.fetchall()[0]
+    pl_data = {
+        'класс': pl_class[0],
+        'хп': pl_class[1],
+        'урон': pl_class[2],
+        'мана': pl_class[3],
+        'макс хп': pl_class[4],
+        'макс мана': pl_class[5],
+    }
+    return pl_data
 
 
 def record_update(turn: int, pl_class: str) -> None:
@@ -66,12 +74,11 @@ def get_data() -> list:
 
 def get_item_data(pl_class, inventory):
     connection, cursor = connect()
-    cursor.execute(f'SELECT * FROM Items WHERE class = ?', (pl_class,))
+    cursor.execute('SELECT * FROM Items WHERE class = ?', (pl_class,))
     lst_items = cursor.fetchall()
     for item in lst_items:
-        for inv in inventory:
-            if item == inv:
-                item.pop(item.index(inv))
+        if item in inventory:
+            item.pop(item.index(inventory))
     value = len(lst_items)
     rand_item = random.randint(1, value)
     item = list(lst_items[rand_item - 1])

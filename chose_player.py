@@ -19,165 +19,166 @@ def player_message(datas: list) -> list:
 
 
 def choice_1(choice: int,
-             enemy_hp: int,
-             hp: int,
-             defence: int,
-             mana: int,
-             stack: int,
-             player: list,
-             crips: list,
-             max_crips: int,
-             players: list,
+             enemy_health: int,
+             player,
+             players,
              enemy_dmg: int,
              value: bool = False,) -> list:
+    defence = 0
     check = False
-    mana_use = False
-    dmg = player[2]
-    for inventory in player[-11]:
+    player['исп маны'] = False
+    dmg = player['урон']
+    for inventory in player['инвентарь']:
         dmg += inventory[5]
     if choice == 1:
-        damag = enemy_hp
-        if player[0] == 'Маг':
-            if mana >= 4:
-                enemy_hp -= dmg
-                mana -= 4
-                mana_use = True
+        damag = enemy_health
+        if player['класс'] == 'Маг':
+            if player['мана'] >= 4:
+                enemy_health -= dmg
+                player['мана'] -= 4
+                player['исп маны'] = True
             else:
-                enemy_hp -= round(dmg/2)
-        elif player[0] == 'Стрелplayerок':
+                enemy_health -= round(dmg/2)
+        elif player['класс'] == 'Стрелок':
             crit_ch = random.randint(1, 10)
             if crit_ch <= 2:
-                enemy_hp -= dmg * 3
+                enemy_health -= dmg * 3
             else:
-                enemy_hp -= dmg
-        elif player[0] == 'Рога':
-            enemy_hp -= (dmg + 4*stack)
-        elif player[0] == 'Призыватель':
-            crip, mana = summon(len(crips), max_crips, mana)
+                enemy_health -= dmg
+        elif player['класс'] == 'Рога':
+            enemy_health -= (dmg + 4*player['стак'])
+        elif player['класс'] == 'Призыватель':
+            crip, player['мана'] = summon(
+                len(player['крипы']),
+                player['макс крипов'],
+                player['мана']
+            )
             if crip == 5:
                 pass
             else:
-                crips.append(crip)
+                player['крипы'].append(crip)
                 print(f' Вы призвали крипа. Его зовут: {crip[0]}')
-                mana_use = True
+                player['исп маны'] = True
             value = True
-        elif player[0] == 'Вампир':
-            enemy_hp -= dmg
+        elif player['класс'] == 'Вампир':
+            enemy_health -= dmg
             if checkin(
-                    int(hp),
-                    int(player[4]),
+                    int(player['хп']),
+                    int(player['макс хп']),
                     int(round(dmg / 2, 0)),
                     False
                     ):
-                hp += int(round(dmg / 2, 0))
-        elif player[0] == 'Хиллер':
-            if mana - 5 > 0:
+                player['хп'] += int(round(dmg / 2, 0))
+        elif player['класс'] == 'Хиллер':
+            if player['мана'] - 5 > 0:
                 os.system('clear')
                 dmg = round(dmg, 0)
                 hill = random.randint(dmg, dmg + 2)
                 hillers = []
                 for played in players:
-                    if played != player and played[1] > 0:
+                    if played != player and played['хп'] > 0:
                         hillers.append(played)
                 n = 0
                 print('Выберите кого полечить:')
                 for hill_target in hillers:
                     print(
                         f' {n + 1}.\n',
-                        f' Имя игрока: {hill_target[-9]}\n',
-                        f' Класс игрока: {hill_target[0]}\n',
-                        f' Здоровье: {hill_target[1]}\n'
+                        f' Имя игрока: {hill_target["имя"]}\n',
+                        f' Класс игрока: {hill_target["класс"]}\n',
+                        f' Здоровье: {hill_target["хп"]}\n'
                     )
                     n += 1
                 choice2 = int(input(' ')) - 1
                 try:
                     if checkin(
-                            hillers[choice2][1],
-                            hillers[choice2][4],
+                            hillers[choice2]['хп'],
+                            hillers[choice2]['макс хп'],
                             hill,
                             False
                             ):
-                        hillers[choice2][1] += hill
+                        hillers[choice2]['хп'] += hill
                         if checkin(
-                                hillers[choice2][3],
-                                hillers[choice2][5],
+                                hillers[choice2]['мана'],
+                                hillers[choice2]['макс мана'],
                                 5,
                                 False
                                 ):
-                            hillers[choice2][3] += 5
+                            hillers[choice2]['мана'] += 5
                         else:
-                            hillers[choice2][3] = hillers[choice2][5]
+                            hillers[choice2]['мана'] = hillers[
+                                choice2
+                                ]['макс мана']
                     else:
-                        hillers[choice2][1] = hillers[choice2][4]
+                        hillers[choice2]['хп'] = hillers[choice2]['макс хп']
                 except Exception:
                     print('Лечить некого')
                 print(f'Вы вылечили игрока на: {hill}')
-                mana -= 5
-                mana_use = True
+                player['мана'] -= 5
+                player['исп маны'] = True
             value = True
-        elif player[0] == 'Бард':
-            if mana - 7 >= 0:
+        elif player['класс'] == 'Бард':
+            if player['мана'] - 7 >= 0:
                 bufs = []
                 for played in players:
                     if played != player:
                         bufs.append(played)
                 for played in bufs:
-                    played[2] *= 1.25
-                    played[-8] += 1
-                    if played[-7] == 0:
-                        played[-7] = 3
-                mana -= 7
-                mana_use = True
+                    played['урон'] *= 1.25
+                    played['стак урон апа'] += 1
+                    if played['время урон апа'] == 0:
+                        played['время урон апа'] = 3
+                player['мана'] -= 7
+                player['исп маны'] = True
             value = True
-        elif player[0] == 'Шаман':
-            if mana - 14 >= 0:
+        elif player['класс'] == 'Шаман':
+            if player['мана'] - 14 >= 0:
                 enemy_dmg /= 2
-                mana -= 14
-                mana_use = True
+                player['мана'] -= 14
+                player['исп маны'] = True
             value = True
-        elif player[0] == 'Чернокнижник':
-            enemy_hp -= dmg
-            hp -= 8
+        elif player['класс'] == 'Чернокнижник':
+            enemy_health -= dmg
+            player['хп'] -= 8
         else:
-            enemy_hp -= dmg
+            enemy_health -= dmg
         if value is False:
-            print(f' Вы совершили атаку на {damag - enemy_hp} единиц')
+            print(f' Вы совершили атаку на {damag - enemy_health} единиц')
     elif choice == 2:
-        if player[0] == 'Хиллер':
+        if player['класс'] == 'Хиллер':
             hp_plus = random.randint(dmg + 1, dmg + 3)
-            if checkin(player[1], player[4], hp_plus, False):
-                if checkin(player[3], player[5], 6, True):
-                    player[1] += hp_plus
+            if checkin(player['хп'], player['макс хп'], hp_plus, False):
+                if checkin(player['хп'], player['макс хп'], 6, True):
+                    player['хп'] += hp_plus
                     print(f' Вы вылечились на {hp_plus} единиц')
             else:
                 print(' Ваше здоровье и так полное')
-            mana -= 6
+            player['мана'] -= 6
             value = True
-        elif player[0] == 'Бард':
-            if mana - 9 >= 0:
+        elif player['класс'] == 'Бард':
+            if player['мана'] - 9 >= 0:
                 bufs = []
                 for played in players:
                     if played != player:
                         bufs.append(played)
                 for played in bufs:
-                    played[-4] += 1
-                    if played[-3] == 0:
-                        played[-3] = 3
-                mana -= 9
-                mana_use = True
+                    played['стак рег хп апа'] += 1
+                    if played['время рег хп апа'] == 0:
+                        played['время рег хп апа'] = 3
+                player['мана'] -= 9
+                player['исп маны'] = True
             value = True
-        elif player[0] == 'Чернокнижник':
+        elif player['класс'] == 'Чернокнижник':
             hill = random.randint(7, 9)
-            if mana - 7 >= 0:
+            if player['мана'] - 7 >= 0:
                 if checkin(
-                        player[1],
-                        player[4],
+                        player['хп'],
+                        player['макс хп'],
                         hill,
                         False
                         ):
-                    player[1] += hill
-                    mana -= 7
-                    mana_use = True
+                    player['хп'] += hill
+                    player['мана'] -= 7
+                    player['исп маны'] = True
                     print(f'Вы вылечились на {hill} единиц')
             value = True
         else:
@@ -185,35 +186,34 @@ def choice_1(choice: int,
         if value is False:
             print(f' Вы защитились на {defence} единиц')
     elif choice == 5:
-        if player[0] == 'Рога':
+        if player['класс'] == 'Рога':
             print(' Вы встаёте в стойку')
             time.sleep(1)
             stoika = False
             inv_ch = random.randint(1, 10)
             stack_ch = random.randint(1, 10)
-            for inventory in player[-11]:
+            inv_ch_pl = 3
+            stack_ch_pl = 5
+            for inventory in player['инвентарь']:
                 if 'Браслет "Скрывающегося в тени"' in inventory:
                     inv_ch_pl = 4
                     stack_ch_pl = 6
                     break
-                else:
-                    inv_ch_pl = 3
-                    stack_ch_pl = 5
             if inv_ch <= inv_ch_pl:
                 stoika = True
                 defence = 100
             if stack_ch <= stack_ch_pl:
                 stoika = True
-                stack += 1
+                player['стак'] += 1
             time.sleep(1)
             if stoika is True:
                 print(' Вы успешно встали в стойку!')
             else:
                 print(' Попытка встать в стойку провалилась(')
-        elif player[0] == 'Призыватель':
+        elif player['класс'] == 'Призыватель':
             os.system('clear')
-            for crip in player[-1]:
-                if crips:
+            for crip in player['крипы']:
+                if player['крипы']:
                     print(f' Имя крипа: {crip[0]}\n',
                           f'Здоровье крипа: {crip[1]}\n')
             print(' Выберите, что будут делать крипы\n',
@@ -223,58 +223,55 @@ def choice_1(choice: int,
             while a:
                 try:
                     crip_choice = int(input(' '))
+                    a = False
                 except ValueError:
                     a = True
             if crip_choice == 1:
-                for crip in crips:
-                    enemy_hp -= crip[2]
+                for crip in player['крипы']:
+                    enemy_health -= crip[2]
             else:
                 check = True
-        elif player[0] == 'Хиллер':
+        elif player['класс'] == 'Хиллер':
             hill = random.randint(dmg, dmg + 4)
-            if checkin(player[3],
-                       player[5],
+            if checkin(player['хп'],
+                       player['макс хп'],
                        9,
                        True):
                 for hill_target in players:
-                    if checkin(hill_target[1],
-                               hill_target[4],
+                    if checkin(hill_target['хп'],
+                               hill_target['макс хп'],
                                hill,
                                False):
-                        hill_target[1] += hill
-                mana -= 9
+                        hill_target['хп'] += hill
+                player['мана'] -= 9
                 print(f' Все были вылечены на {hill}')
-                mana_use = True
-        elif player[0] == 'Бард':
-            if mana - 5 >= 0:
+                player['исп маны'] = True
+        elif player['класс'] == 'Бард':
+            if player['мана'] - 5 >= 0:
                 bufs = []
                 for played in players:
                     if played != players:
                         bufs.append(played)
                 for played in bufs:
-                    played[-6] += 1
-                    if played[-5] == 0:
-                        played[5] = 3
-                mana_use = True
-                mana -= 5
+                    played['стак рег мана апа'] += 1
+                    if played['время рег мана апа'] == 0:
+                        played['время рег мана апа'] = 3
+                player['исп маны'] = True
+                player['мана'] -= 5
     elif choice == 3:
         os.system('clear')
         print('Такие предметы у тебя в инвентаре')
-        for inventory in player[-11]:
+        for inventory in player['инвентарь']:
             print(
-                f'{inventory[0]}\n'
+                f'{inventory[0]}: {inventory[10]}\n'
             )
         check = True
     time.sleep(2)
     os.system('clear')
     return (choice,
-            enemy_hp,
-            hp,
-            defence,
-            mana,
-            stack,
-            crips,
-            check,
-            mana_use,
+            enemy_health,
+            player,
             players,
-            enemy_dmg)
+            check,
+            enemy_dmg,
+            defence)
